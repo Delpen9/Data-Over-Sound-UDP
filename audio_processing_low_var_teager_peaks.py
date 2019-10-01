@@ -50,7 +50,7 @@ import wave # Python 3 module for reading / writing simple .wav files
 # waveFile.writeframes(b''.join(frames))
 # waveFile.close()
 
-fs, data = wavfile.read('file13.wav')
+fs, data = wavfile.read('file7.wav')
 
 data = [np.int64(i) for i in data]
 
@@ -74,7 +74,9 @@ post_processed = [i if i > 1/100*max_value else 0 for i in teager_second_data]
 # 1000 picks up i % 4 very well while 500 picks up i % 2 very well
 # spacing between bits at rate of 100 bits/s is approximately 250: 
 # 0 --> 1 = distance of 250
-peaks, _ = find_peaks(post_processed, None, 0, 1, 1/20*max_value, [1.25, 2])
+
+#Height value should modulate depending on quality of the signal
+peaks, _ = find_peaks(post_processed, None, 0, 1, 1/27*max_value, [1, 3])
 peak_dimensions = peak_widths(post_processed, peaks, rel_height=0.5)
 
 print(peaks)
@@ -85,7 +87,8 @@ post_processed_data_chunk = []
 for i in range(len(peaks)):
     if len(chunk_list) == 0:
         chunk_list.append(peaks[i])
-    elif peaks[i] - peaks[i - 1] < 400:
+    ## Distance value should modulate depending on bit spacing
+    elif peaks[i] - peaks[i - 1] < 150:
         chunk_list.append(peaks[i])
         if i == len(peaks) - 1:
             post_processed_data_chunk.append(chunk_list)
