@@ -50,14 +50,12 @@ import wave # Python 3 module for reading / writing simple .wav files
 # waveFile.writeframes(b''.join(frames))
 # waveFile.close()
 
-fs, data = wavfile.read('file7.wav')
+## Edge case files: 2, 3, 5, 14, 15, 16
+## Almost perfect: 9, 10, 11, 12, 13
+fs, data = wavfile.read('file17.wav')
 
 data = [np.int64(i) for i in data]
 
-# Teager
-# !IMPORTANT
-# Consider reversing the data set then performing the teager operator again
-# Compare the results of both to get middle values
 teager_first_data = Teager(np.abs(data), 'horizontal', 1)
 teager_first_data = [np.int64(i) for i in teager_first_data]
 
@@ -65,6 +63,7 @@ teager_second_data = Teager(np.abs(teager_first_data), 'horizontal', 1)
 teager_second_data = [np.int64(i) for i in teager_second_data]
 
 max_value = np.amax(teager_second_data)
+
 # This might need to be improved but does work well currently
 post_processed = [i if i > 1/100*max_value else 0 for i in teager_second_data]
 
