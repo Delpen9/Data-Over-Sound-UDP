@@ -7,14 +7,26 @@ def collect_data(directory):
     data = [np.int64(i) for i in data]
     return data
 
-# TODO: Replace with start and end frequencies of carrier length 10
-def find_edges(data):
-    max_value = np.amax(data)
-    data = [i if i > 1/10*max_value else 0 for i in data]
-    peaks, _ = find_peaks(data, None, 0, 1, 1)    ## Look into this. It might detect incorrect peaks. Potential to break the whole program
-    left_edge = peaks[0]
-    right_edge = peaks[len(peaks) - 1]
-    return left_edge, right_edge
+# -----------------------------------------------------------------
+# TODO: Find start and end frequencies to position packet for demodulation
+# -----------------------------------------------------------------
+def demodulate_packet(data):
+    start_of_packet, end_of_packet = find_packet_boundaries(data)
+    carrier_list = sliding_door(start_of_packet, end_of_packet, data)
+    return carrier_list
+
+def find_packet_boundaries(data):
+    # This is the hard part
+    return None
+
+def start_of_packet(carrier_list):
+    # This is the hard part
+    return None
+
+def end_of_packet(carrier_list):
+    # This is the hard part
+    return None
+# -----------------------------------------------------------------
 
 def accumulate_frequency_samples(left_position, right_position, data):
     frequency_samples = []
@@ -44,18 +56,6 @@ def samples_to_carrier(left_position, right_position, data):
     carrier = match_carrier(frequency)
     return carrier
 
-# By the 'sliding door' method, move from left to right at
-# increments of 441 bits, using frequency demodulation from the
-# bands between 10800 - 12600 bits, inclusive, at increments of
-# 200 bits. This totals to be about 10 different frequencies. 
-# At a baud rate of 100 bps, this means that the effective bps is 
-# 300 bps with a start and end frequency. 
-# By implementing Amplitude modulation, you can get a 
-# multiplier effect of x2 for two distinguishable, 
-# non-zero amplitudes to then be 400 bps.
-# Using an amplitude of 0 will only result in a carrier increase of 1,
-# contributing to the additive effect. However, this may jeopardize the
-# quality of the algorithm for litte gain.
 def sliding_door(left_edge, right_edge, data):
     carrier_list = []
     for bit in range(left_edge, right_edge + 1, 441):
