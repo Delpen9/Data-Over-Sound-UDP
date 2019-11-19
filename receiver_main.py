@@ -6,7 +6,9 @@ import wave
 import demodulate
 
 q = Queue()
-# TODO: Make this accumulate over time - recording history
+# -----------------------------------------------------------
+# TODO: Make this accumulate over time - recording history (lesser importance)
+# -----------------------------------------------------------
 directory = 'audio_bin/wav_' + str(1) + '.wav'
 
 class producer_thread(threading.Thread):
@@ -31,10 +33,12 @@ class producer_thread(threading.Thread):
         packet = []
 
         # Record
+        # ------------------------------------------------------------
         # TODO: Possibility that what is inside this while loop is too slow
-        send_interval = int(RATE / CHUNK)
+        # ------------------------------------------------------------
+        send_interval = int(RATE / CHUNK) # Exactly one carrier
         time = 1
-        while self.running:
+        while self.running: # Terminates when producer is killed
             time += 1
             data = stream.read(CHUNK)
             packet.append(data)
@@ -61,6 +65,9 @@ class producer_thread(threading.Thread):
 class consumer_thread(Thread):
     def run(self):
         data = []
+        # ------------------------------------------------------------
+        # TODO: Possibility that what is inside this while loop is too slow
+        # ------------------------------------------------------------        
         while True:
             datum = q.get()
 
@@ -72,19 +79,14 @@ class consumer_thread(Thread):
                 return data
 
 ## --------------------------------------------------------
-## Write a DSP Algorithm to determine if packets ends
+## TODO: Write a DSP Algorithm to determine if packets ends
 ## --------------------------------------------------------
 def is_packet_end(data):
     # ------------
-    # algorithm goes here
+    # code goes here
     # ------------
     return False
 ## --------------------------------------------------------
-## /Finished
-## --------------------------------------------------------
-
-def receiver_instance(directory):
-    receive.record_audio(directory)
 
 if __name__ == '__main__':
     # Create Producer
@@ -95,16 +97,15 @@ if __name__ == '__main__':
     p.start()
     c.start()
 
-    # TODO: Get this to trigger at the correct time
+    c.join()
     p.running = False
     p.join()
-    c.join()
 
     data = demodulate.collect_data(directory)
-    left_edge, right_edge = demodulate.find_edges(data)
+    carrier_list = demodulate.demodulate_packet(data)
 
     # -----------------------------------------------------
-    # Code to do something with the demodulated information
+    # TODO: Code to do something with the demodulated information (carrier_list)
     # -----------------------------------------------------
 
     print('Recording Ended')
